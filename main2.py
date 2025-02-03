@@ -22,7 +22,7 @@ def load_and_sample_data(dataset_name, sample_size, seed=42):
 
 def main():
     
-    total = 960
+    total = 2880
     half = int(total/2)
     max = int(total/8)
     
@@ -36,11 +36,11 @@ def main():
     set_A = duplicated_data.select(range(num_duplicates)) 
     set_B = duplicated_data.select(range(num_duplicates)) 
     
-    set_A_group1 = set_A.select(range(int(0.7 * len(set_A))))
-    set_A_group2 = set_A.select(range(int(0.7 * len(set_A)), len(set_A))) 
+    set_A_group1 = set_A.select(range(int(0.7 * len(set_A)))) # 302 size
+    set_A_group2 = set_A.select(range(int(0.7 * len(set_A)), len(set_A))) # 130
 
-    set_B_group3 = set_B.select(range(int(0.7 * len(set_B)))) 
-    set_B_group4 = set_B.select(range(int(0.7 * len(set_B)), len(set_B)))
+    set_B_group3 = set_B.select(range(int(0.7 * len(set_B)))) # 302 size
+    set_B_group4 = set_B.select(range(int(0.7 * len(set_B)), len(set_B))) # 130
     
     group1 = unique_data.select(range(0,max-len(set_A_group1)))
     group2 = unique_data.select(range(max-len(set_A_group1), (max-len(set_A_group1) + max-len(set_A_group2))))
@@ -49,10 +49,10 @@ def main():
     start = ((max-len(set_A_group1) + max-len(set_A_group2)) + (max-len(set_B_group3)))
     group4 = unique_data.select(range(start,start + (max-len(set_B_group4))))
     
-    group5 = sampled_data.select(range(half, half + 120))
-    group6 = sampled_data.select(range(half + 120, half + 240))
-    group7 = sampled_data.select(range(half + 240, half + 360))
-    group8 = sampled_data.select(range(half + 360, half + 480))
+    group5 = sampled_data.select(range(half, half + 360))
+    group6 = sampled_data.select(range(half + 360, half + 720))
+    group7 = sampled_data.select(range(half + 720, half + 1080))
+    group8 = sampled_data.select(range(half + 1080, half + 1440))
     
     group1 = concatenate_datasets([set_A_group1, group1])
     group2 = concatenate_datasets([set_A_group2, group2])
@@ -60,7 +60,7 @@ def main():
     group4 = concatenate_datasets([set_B_group4, group4])
     
     groups = [group1, group2, group3, group4, group5, group6, group7, group8]
-    filenames = [f'Dataset960/data{i}.csv' for i in range(1, 9)]
+    filenames = [f'Dataset2880/data{i}.csv' for i in range(1, 9)]
     save_groups(groups, filenames)
 
 if __name__ == "__main__":
