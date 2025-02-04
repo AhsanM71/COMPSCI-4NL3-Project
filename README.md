@@ -27,7 +27,7 @@ This dataset consists of stock market about major technology company stocks, pri
 - Annotators will need to label the sentiment of the tweet as either positive, negative, or neutral
 - Estimated annotation time per instance: 10 seconds (based on test annotations by team members)
 - Total annotation capacity for 8-hour day: 2880 instances
-  - Calculation: (8 hours _ 60 minutes _ 60 seconds) / 10 seconds per instance = 2880 instances
+  - Calculation: (8 hours x 60 minutes x 60 seconds) / 10 seconds per instance = 2880 instances
 
 # Dataset Sampling Explanation
 
