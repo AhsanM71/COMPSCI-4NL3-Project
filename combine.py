@@ -1,5 +1,6 @@
 import pandas as pd
 import glob
+import matplotlib.pyplot as plt
 from sklearn.metrics import cohen_kappa_score
 
 
@@ -128,9 +129,24 @@ def extract_and_merge(source_file, target_file, output_file):
     merged_df.to_csv(output_file, index=False)
     print(f"Merged data written to {output_file}")
 
+def display_distribution():
+    df = pd.read_csv('Step3/FinalData/combined.csv')
+
+    label_counts = df['label'].value_counts().sort_index()
+    print(label_counts)
+
+    plt.figure(figsize=(6, 4))
+    plt.bar(label_counts.index, label_counts.values, color=['red', 'blue', 'green'])
+    plt.xlabel('Labels')
+    plt.ylabel('Count')
+    plt.title('Distribution of Labels')
+    plt.xticks(label_counts.index)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
 def main():
     perform_cohen_analysis()
-    
+    display_distribution()
     # extract()
     # perform_truth_table_analysis()
     # extract_and_merge(src,target,out)
