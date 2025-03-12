@@ -143,10 +143,33 @@ def display_distribution():
     plt.xticks(label_counts.index)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
+    
+def get_normalized():
+    df = pd.read_csv("Step3/FinalData/combined.csv")
+    # Filter all rows where label is -1 or 1
+    df_negative = df[df["label"] == -1]  # ≈ 400 rows
+    df_positive = df[df["label"] == 1]   # ≈ 400 rows
+
+    # Sample exactly 600 rows where label is 0
+    df_neutral = df[df["label"] == 0].sample(n=600, random_state=42)
+
+    # Combine the three subsets into a new dataframe
+    df_balanced = pd.concat([df_negative, df_neutral, df_positive])
+
+    # Shuffle the dataset to avoid order bias
+    df_balanced = df_balanced.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    # Save the new dataset
+    df_balanced.to_csv("Step3/FinalData/normalized_data.csv", index=False)
+
+    print(f"New dataset distribution:\n{df_balanced['label'].value_counts()}")
+    print("Normalized dataset saved as 'normalized_data.csv'.")
 
 def main():
     perform_cohen_analysis()
     display_distribution()
+    
+    # get_normalized()
     # extract()
     # perform_truth_table_analysis()
     # extract_and_merge(src,target,out)
