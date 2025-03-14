@@ -50,7 +50,7 @@ def logisticRegressionModel(X_train, y_train, X_test):
     y_pred = model.predict(X_test)
     return model
 
-def predict_category_for_logistic_regression(text, vectorizer, model, categories):
+def predict_category_for_logistic_regression(text, model, vectorizer, categories):
     """predict new text category"""
     # first lemmatize
     lemmatized = lemmatization([text])[0]
@@ -65,6 +65,23 @@ def predict_category_for_logistic_regression(text, vectorizer, model, categories
     return {
         'category': categories[prediction_to_index[prediction]],
         'confidence': probability[prediction_to_index[prediction]]
+    }
+
+def predict_category_for_neural_network(text, model, vectorizer, categories):
+    """Predict new text category using PyTorch model"""
+    model.eval()
+    lemmatized = lemmatization([text])[0]
+    text_vector = vectorizer.transform([lemmatized])
+    text_tensor = torch.tensor(text_vector.toarray(), dtype=torch.float32)
+
+    with torch.no_grad():
+        output = model(text_tensor)
+        probabilities = torch.softmax(output, dim=1)  # Shape: (1, num_classes)
+        prediction = torch.argmax(probabilities, dim=1).item()  # Extract single prediction
+    
+    return {
+        'category': categories[prediction],
+        'confidence': probabilities[0, prediction].item()  # Correct indexing
     }
 
 def output_results(model, X_train, y_train, X_val, y_val, X_test, y_test, categories):
@@ -96,48 +113,8 @@ def output_results(model, X_train, y_train, X_val, y_val, X_test, y_test, catego
     y_pred = model.predict(X_test)
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred, target_names=categories))
-
-def main():
-    # df = pd.read_csv("Step3/FinalData/combined.csv")
-    df = pd.read_csv("Step3/FinalData/normalized_data.csv")
-    texts = df['body']
-    labels = df['label']
-    categories = ["negative", "neutral", "positive"]
     
-    pre_processed_text = lemmatization(texts)
-    
-    tfidf_vectorizer = TfidfVectorizer(
-        stop_words='english',
-        max_features=5000,
-        min_df=5,
-        preprocessor=lambda x: x,  # keep text unchanged, already preprocessed
-        tokenizer=lambda x: x.split()  # simple tokenization, text already standardized
-    )
-    X_tfidf = tfidf_vectorizer.fit_transform(pre_processed_text)
-    
-    
-    X_train, X_temp, y_train, y_temp = train_test_split(X_tfidf, labels, test_size=0.3, random_state=42)
-    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42) 
-    
-    # model = logisticRegressionModel(X_train, y_train, X_test)
-    
-    # # test new text
-    # test_texts = [
-    #     "I'm thrilled with the recent performance of $AAPL! The new product launch exceeded expectations.",
-    #     "The market is unpredictable today. Not sure how $GOOG will move.",
-    #     "Disappointed with $TSLA's quarterly results. The numbers were below projections."
-    # ]
-
-    # print("\nTesting new texts:")
-    # for text in test_texts:
-    #     result = predict_category_for_logistic_regression(text, tfidf_vectorizer, model, categories)
-    #     print(f"\nText: {text}")
-    #     print(f"Category: {result['category']}")
-    #     print(f"Confidence: {result['confidence']:.2f}")
-    #     print("-" * 50)
-        
-    # output_results(model, X_train, y_train, X_val,y_val, X_test, y_test, categories)
-    
+def neural_network(X_train, X_test, X_val, y_train, y_val, y_test, categories):
     X_train_tensor = torch.tensor(X_train.toarray(), dtype=torch.float32)
     X_val_tensor = torch.tensor(X_val.toarray(), dtype=torch.float32)
     X_test_tensor = torch.tensor(X_test.toarray(), dtype=torch.float32)
@@ -217,8 +194,58 @@ def main():
     accuracy = correct / total
     print(f"Test Accuracy: {accuracy:.2f}")
     
+    return model
+
+def main():
+    # test new text
+    test_texts = [
+        "I'm thrilled with the recent performance of $AAPL! The new product launch exceeded expectations.",
+        "The market is unpredictable today. Not sure how $GOOG will move.",
+        "Disappointed with $TSLA's quarterly results. The numbers were below projections."
+    ]
+    df = pd.read_csv("Step3/FinalData/combined.csv")
+    # df = pd.read_csv("Step3/FinalData/normalized_data.csv")
+    # df = pd.read_csv("Step3/FinalDataGPT/combined.csv")
+    texts = df['body']
+    labels = df['label']
+    categories = ["negative", "neutral", "positive"]
+    
+    pre_processed_text = lemmatization(texts)
+    # print(pre_processed_text)
+    
+    tfidf_vectorizer = TfidfVectorizer(
+        stop_words='english',
+        max_features=5000,
+        min_df=5,
+        preprocessor=lambda x: x,  # keep text unchanged, already preprocessed
+        tokenizer=lambda x: x.split()  # simple tokenization, text already standardized
+    )
+    X_tfidf = tfidf_vectorizer.fit_transform(pre_processed_text)
+    
+    X_train, X_temp, y_train, y_temp = train_test_split(X_tfidf, labels, test_size=0.3, random_state=42)
+    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42) 
+    
+    # model = logisticRegressionModel(X_train, y_train, X_test)
+
+    # print("\nTesting new texts:")
+    # for text in test_texts:
+    #     result = predict_category_for_logistic_regression(text, model, tfidf_vectorizer, categories)
+    #     print(f"\nText: {text}")
+    #     print(f"Category: {result['category']}")
+    #     print(f"Confidence: {result['confidence']:.2f}")
+    #     print("-" * 50)
+        
+    # output_results(model, X_train, y_train, X_val,y_val, X_test, y_test, categories)
     
     
+    model = neural_network(X_train, X_test, X_val, y_train, y_val, y_test, categories)
+    
+    print("\nTesting new texts:")
+    for text in test_texts:
+        result = predict_category_for_neural_network(text, model, tfidf_vectorizer, categories)
+        print(f"\nText: {text}")
+        print(f"Category: {result['category']}")
+        print(f"Confidence: {result['confidence']:.2f}")
     
     
 if __name__ == "__main__":

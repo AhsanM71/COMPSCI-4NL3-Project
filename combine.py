@@ -34,12 +34,18 @@ def perform_cohen_analysis():
     print(f"Cohen's Kappa for data2.csv and data4.csv: {kappa2}")
     print(f"Cohen's Kappa for BagA and BagB: {kappa3}")
     
+def format2():
+    path = "GPT/annotated_data7.csv"
+    df = pd.read_csv(path)
+    df['sentiment'] = df['label']
+    df.to_csv(path, index=False)
+    
 def format():
-    df = pd.read_csv("combined_filed2.csv")
+    df = pd.read_csv("GPT/combined_filed.csv")
     
-    extracted_df = df[['body', 'label']]
+    extracted_df = df[['body', 'sentiment']]
     
-    extracted_df.to_csv("combined_filed2.csv", index=False)
+    extracted_df.to_csv("combined_filed.csv", index=False)
     print(f"Extracted columns saved to combined_filed2.csv")
 
 def extract():
@@ -62,13 +68,13 @@ def extract():
     df4_first_130.to_csv('AnalysisData/annotator4.csv', index=False)
 
 def combineIntoOne():
-    path = "AnnotatedData/final/"
+    path = "GPT/"
     csv_files = glob.glob(path + "*.csv")
     dfs = [pd.read_csv(file) for file in csv_files]
     
     combined_df = pd.concat(dfs,ignore_index=True)
     
-    combined_df.to_csv('combined_filed.csv', index=False)
+    combined_df.to_csv('GPT/combined_filed.csv', index=False)
     
     print(combined_df.head())
     
@@ -117,9 +123,9 @@ def perform_truth_table_analysis():
 
 def extract_and_merge(source_file, target_file, output_file):
     source_df = pd.read_csv(source_file)
-    if len(source_df) < 131:
-        print("Source file has less than 131 rows. Nothing to extract.")
-        return
+    # if len(source_df) < 131:
+    #     print("Source file has less than 131 rows. Nothing to extract.")
+    #     return
     extracted_df = source_df.iloc[130:] 
     
     target_df = pd.read_csv(target_file)
@@ -130,9 +136,9 @@ def extract_and_merge(source_file, target_file, output_file):
     print(f"Merged data written to {output_file}")
 
 def display_distribution():
-    df = pd.read_csv('Step3/FinalData/combined.csv')
+    df = pd.read_csv('Step3/FinalDataGPT/combined.csv')
 
-    label_counts = df['label'].value_counts().sort_index()
+    label_counts = df['sentiment'].value_counts().sort_index()
     print(label_counts)
 
     plt.figure(figsize=(6, 4))
@@ -151,7 +157,7 @@ def get_normalized():
     df_positive = df[df["label"] == 1]   # ≈ 400 rows
 
     # Sample exactly 600 rows where label is 0
-    df_neutral = df[df["label"] == 0].sample(n=600, random_state=42)
+    df_neutral = df[df["label"] == 0].sample(n=300, random_state=42)
 
     # Combine the three subsets into a new dataframe
     df_balanced = pd.concat([df_negative, df_neutral, df_positive])
@@ -166,9 +172,8 @@ def get_normalized():
     print("Normalized dataset saved as 'normalized_data.csv'.")
 
 def main():
-    perform_cohen_analysis()
+    # perform_cohen_analysis()
     display_distribution()
-    
     # get_normalized()
     # extract()
     # perform_truth_table_analysis()
