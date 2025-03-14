@@ -144,9 +144,8 @@ def display_distribution():
     plt.show()
 
 def main():
-    # perform_cohen_analysis()
-    combineIntoOne("Step3/FinalData/")
-    # display_distribution()
+    perform_cohen_analysis()
+    display_distribution()
     # extract()
     # perform_truth_table_analysis()
     # extract_and_merge(src,target,out)
