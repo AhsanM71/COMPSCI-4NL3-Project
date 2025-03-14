@@ -61,14 +61,13 @@ def extract():
     df2_first_130.to_csv('AnalysisData/annotator3.csv', index=False)
     df4_first_130.to_csv('AnalysisData/annotator4.csv', index=False)
 
-def combineIntoOne():
-    path = "AnnotatedData/final/"
+def combineIntoOne(path):
     csv_files = glob.glob(path + "*.csv")
     dfs = [pd.read_csv(file) for file in csv_files]
     
     combined_df = pd.concat(dfs,ignore_index=True)
     
-    combined_df.to_csv('combined_filed.csv', index=False)
+    combined_df.to_csv('combined.csv', index=False)
     
     print(combined_df.head())
     
@@ -145,8 +144,9 @@ def display_distribution():
     plt.show()
 
 def main():
-    perform_cohen_analysis()
-    display_distribution()
+    # perform_cohen_analysis()
+    combineIntoOne("Step3/FinalData/")
+    # display_distribution()
     # extract()
     # perform_truth_table_analysis()
     # extract_and_merge(src,target,out)

@@ -27,7 +27,7 @@ def create_random_baseline(input_file, output_file):
 
 
 if __name__ == "__main__":
-    input_file = "Step3/FinalData/combined.csv"
-    output_file = "Step3/FinalData/random_baseline.csv"
+    input_file = "FinalData/combined.csv"
+    output_file = "FinalData/random_baseline.csv"
 
     create_random_baseline(input_file, output_file)
