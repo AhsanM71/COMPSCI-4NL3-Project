@@ -193,7 +193,7 @@ def neural_network(X_train, X_test, X_val, y_train, y_val, y_test, categories):
 
     # Model parameters
     input_dim = X_train.shape[1]  # Number of features (e.g., 2716)
-    hidden_dim = 128  # Can be tuned
+    hidden_dim = 64  # Can be tuned
     output_dim = len(categories)  # Number of classes (should be 3)
 
     model = TextClassifier(input_dim, hidden_dim, output_dim)
@@ -323,14 +323,14 @@ def save_labels_and_data(X_train,X_val,X_test,y_train,y_val,y_test):
     X_test_dense = X_test.toarray()
 
     # Save feature matrices
-    save_txt_data("Data/X_train.txt", X_train_dense)
-    save_txt_data("Data/X_val.txt", X_val_dense)
-    save_txt_data("Data/X_test.txt", X_test_dense)
+    save_txt_data("RandomData/X_train.txt", X_train_dense)
+    save_txt_data("RandomData/X_val.txt", X_val_dense)
+    save_txt_data("RandomData/X_test.txt", X_test_dense)
 
     # Save labels
-    save_txt_labels("Data/y_train.txt", y_train)
-    save_txt_labels("Data/y_val.txt", y_val)
-    save_txt_labels("Data/y_test.txt", y_test)
+    save_txt_labels("RandomData/y_train.txt", y_train)
+    save_txt_labels("RandomData/y_val.txt", y_val)
+    save_txt_labels("RandomData/y_test.txt", y_test)
     
 def verify_data_integrity(original, filename):
     # Reload the saved data
@@ -364,11 +364,7 @@ def main():
         tokenizer=lambda x: x.split()  # simple tokenization, text already standardized
     )
     X_tfidf = tfidf_vectorizer.fit_transform(pre_processed_text)
-    
-    
-    # X_train, X_temp, y_train, y_temp = train_test_split(X_tfidf, labels, test_size=0.3, random_state=42)
-    # X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42) 
-    
+        
     # Currently in Data Folder
     X_train, X_temp, y_train, y_temp = train_test_split(X_tfidf, labels, test_size=0.3, random_state=42, stratify=labels)
     X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp)
@@ -390,7 +386,8 @@ def main():
     model, test_loader = neural_network(X_train, X_test, X_val, y_train, y_val, y_test, categories)
     
     predicted_labels = get_predictions(model, test_loader)
-    save_txt_labels("Data/y_predicted.txt", predicted_labels)
+    # save_labels_and_data(X_train, X_val, X_test,y_train,y_val,y_test)
+    # save_txt_labels("RandomData/y_predicted.txt", predicted_labels)
     # # print(predicted_labels)
     
     # print("\nTesting new texts:")
